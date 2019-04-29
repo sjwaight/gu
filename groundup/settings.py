@@ -16,10 +16,10 @@ import datetime
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-try:
-    BASE_DIR = local_settings.BASE_DIR
-except:
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# try:
+#     BASE_DIR = local_settings.BASE_DIR
+# except:
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -173,15 +173,15 @@ WSGI_APPLICATION = 'groundup.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 # This should be overriden in local_settings.py
 
-try:
-    DATABASES = local_settings.DATABASES
-except:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+# try:
+#     DATABASES = local_settings.DATABASES
+# except:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+}
 
 
 # Internationalization
@@ -202,16 +202,16 @@ SITE_ID = 1
 
 # CACHES: This should be overriden in local_settings.py
 
-try:
-    CACHES = local_settings.CACHES
-except:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
-            'KEY_PREFIX': 'gu',
-        }
+# try:
+#     CACHES = local_settings.CACHES
+# except:
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
+        'KEY_PREFIX': 'gu',
     }
+}
 
 
 STATICFILES_FINDERS = (
@@ -325,35 +325,22 @@ HAYSTACK_CONNECTIONS = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
     },
     'handlers': {
-        'file': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': local_settings.ERROR_LOG_FILE,
-            'formatter': 'verbose'
-        },
         'mail_admins': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
         }
     },
     'loggers': {
-        'django': {
-            'handlers': ['file', 'mail_admins', ],
-            'propagate': True,
-            'level': 'WARNING',
-        },
-        'groundup': {
-            'handlers': ['file'],
-            'level': 'WARNING',
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
             'propagate': True,
         },
     }
