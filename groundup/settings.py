@@ -401,7 +401,10 @@ else:
 PIWIK_SITEID = 1
 PIWIK_ENTRIES = 40
 
-from .local_settings import *
+try:
+    from .local_settings import *
+except ImportError:
+    pass
 
 if DEBUG is True:
     INSTALLED_APPS = INSTALLED_APPS + ('debug_toolbar',)
