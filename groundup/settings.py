@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 import datetime
-from . import local_settings
+# from . import local_settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -25,18 +25,18 @@ except:
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECRET KEY: This must be set in local_settings.py
-SECRET_KEY = local_settings.SECRET_KEY
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # DEBUG: This should be overriden in local_settings.py
 try:
-    DEBUG = local_settings.DEBUG
+    DEBUG = os.environ['DEBUG']
 except:
     DEBUG = True
 
-if DEBUG is False:
-    ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
-else:
-    ALLOWED_HOSTS = []
+# if DEBUG is False:
+#     ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
+# else:
+    ALLOWED_HOSTS = {'*'}
 
 
 # Application definition
@@ -325,35 +325,22 @@ HAYSTACK_CONNECTIONS = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
     },
     'handlers': {
-        'file': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': local_settings.ERROR_LOG_FILE,
-            'formatter': 'verbose'
-        },
         'mail_admins': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
         }
     },
     'loggers': {
-        'django': {
-            'handlers': ['file', 'mail_admins', ],
-            'propagate': True,
-            'level': 'WARNING',
-        },
-        'groundup': {
-            'handlers': ['file'],
-            'level': 'WARNING',
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
             'propagate': True,
         },
     }
